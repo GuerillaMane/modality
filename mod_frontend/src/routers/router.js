@@ -1,5 +1,5 @@
 import VueRouter from 'vue-router'
-import modalityMain from "../components/modalityMain";
+import modalityMain from "../components/modalityComponent";
 
 /* eslint-disable no-console */
 // eslint-disable-next-line no-unused-vars
@@ -7,8 +7,8 @@ const router =  new VueRouter({
   routes: [
     {
       path: '/',
-      name: 'modalityMain',
-      component: modalityMain
+      name: 'modalityComponent',
+      component: modalityComponent
     },
   ],
 });
