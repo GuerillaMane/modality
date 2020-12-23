@@ -1,5 +1,5 @@
 import VueRouter from 'vue-router'
-import modalityMain from "../components/modalityComponent";
+import modalityComponent from "../components/modalityComponent";
 
 /* eslint-disable no-console */
 // eslint-disable-next-line no-unused-vars
