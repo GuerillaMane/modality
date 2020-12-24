@@ -161,3 +161,7 @@ button:hover {
   margin: 0;
   padding: 0;
 }
+
+.orange-text {
+    color: #fca83a !important;
+}
