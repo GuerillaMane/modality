@@ -1,7 +1,7 @@
 <template>
     <div id="app-modality" @contextmenu="openMenu">
         <mu-row class="bottom-margin">
-            <mu-select v-model="currentLangId">
+            <mu-select v-model="currentLangId" style="width: 100px;">
                 <mu-option v-for="lang in allLanguages" :key="lang"
                            :label="lang.name" :value="lang.id">
                 </mu-option>
@@ -13,8 +13,8 @@
         </mu-row>
 
         <mu-row class="bottom-margin">
-            <button class="def-button" @click.prevent="fixText">Зафиксировать</button>
-            <button class="def-button" @click.prevent="nextText">След.</button>
+            <button v-if="editMode" class="def-button" @click.prevent="fixText">Сохранить</button>
+            <button v-if="fixMode" class="def-button" @click.prevent="nextText">След.</button>
         </mu-row>
 
         <ul id="right-click-menu" tabindex="-1" ref="right" v-if="viewMenu"
@@ -53,16 +53,24 @@
                 // languagesList: null
                 allLanguages: null,
                 currentLangId: null,
+
+                editMode: true,
+                fixMode: false,
             }
         },
         methods: {
             fixText: function () {
                 document.getElementById("txt").readOnly = "true";
+                this.editMode = false;
+                this.fixMode = true;
+                this.putText();
             },
 
             nextText: function () {
                 this.textString = '';
                 document.getElementsByTagName("textarea")[0].readOnly = false;
+                this.fixMode = false;
+                this.editMode = true;
             },
 
             selectHighlightedText: function () {
@@ -95,9 +103,16 @@
             });
             },
 
-            // putText: function () {
-            //
-            // }
+            putText: function () {
+                let requestData = {
+                    'text': this.textString,
+                    'url': '',
+                    'lang': {
+                        'id': this.currentLangId
+                    }
+                }
+                axios.post()
+            },
 
             setMenu: function(top, left) {
 
@@ -122,7 +137,7 @@
 
                 this.$nextTick(function() {
                     this.$refs.right.focus();
-                    this.setMenu(e.y, e.x)
+                    this.setMenu(e.y, e.x);
                 }.bind(this));
                 e.preventDefault();
             }
@@ -135,9 +150,6 @@
 </script>
 
 <style scoped>
-    .wrapper {
-        width: 100%;
-    }
     .bottom-margin {
         margin-bottom: 25px;
     }
