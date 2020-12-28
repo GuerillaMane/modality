@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "axios": "^0.21.1",
+    "chart.js": "^2.9.4",
     "core-js": "^3.8.1",
     "muse-ui": "^3.0.2",
     "vue": "^2.6.12",

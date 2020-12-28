@@ -112,10 +112,10 @@
 
             putText: function () {
                 let requestData = {
-                    'text': this.textString,
-                    'url': '',
-                    'lang': {
-                        'id': this.currentLangId
+                    text: this.textString,
+                    // url: this.currentUrl,
+                    lang: {
+                        id: this.currentLangId
                     }
                 }
                 axios.put('/text', requestData)
