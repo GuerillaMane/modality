@@ -23,6 +23,8 @@
                 {{ type.name }}
             </li>
         </ul>
+<!--        <div v-if="result"><h5>{{result}}</h5></div>-->
+<!--        <div v-if="errResult"><h5 class="orange-text">{{errResult}}</h5></div>-->
     </div>
 </template>
 
@@ -36,7 +38,7 @@
                 textString: '',
                 textData: {
                     text: null,
-                    url: null,
+                    // url: null,
                     lang: {
                         id: null
                     }
@@ -56,6 +58,11 @@
 
                 editMode: true,
                 fixMode: false,
+
+                // currentUrl: '',
+
+                // result: null,
+                // errResult: null,
             }
         },
         methods: {
@@ -111,7 +118,18 @@
                         'id': this.currentLangId
                     }
                 }
-                axios.post()
+                axios.put('/text', requestData)
+                    .then(response => {
+                      if (response.status === 200) {
+                        console.log(response.data);
+                        console.log('Протокол успешно создан');
+                        // this.result = 'Протокол успешно создан';
+                      }
+                    })
+                    .catch(response => {
+                      console.log(response);
+                      // this.errResult = response.response.data.error;
+                    });
             },
 
             setMenu: function(top, left) {
