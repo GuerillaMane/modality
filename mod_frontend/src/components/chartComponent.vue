@@ -1,8 +1,18 @@
 <template>
     <div id="chartBar">
+        <mu-select class="mu-text-hide" v-model="typeIds" multiple filerable help-text="Модальности" tags>
+<!--            <template slot="selection" slot-scope="scope">-->
+<!--                <mu-chip :selected="scope.selected" color="teal">-->
+<!--                {{scope.label}}-->
+<!--                </mu-chip>-->
+<!--            </template>-->
+            <mu-option v-for="type in allTypes" :key="type" :label="type.name" :value="type.id"></mu-option>
+        </mu-select>
+
         <div class="processIcon" v-show="process">
-          <mu-circular-progress class="demo-circular-progress" :size="36"></mu-circular-progress>
+          <mu-circular-progress class="demo-circular-progress" :size="52"></mu-circular-progress>
         </div>
+
         <div class="div-chart-canvas">
           <canvas class="chartjs-render-monitor" ref="canvasChart"></canvas>
         </div>
@@ -11,6 +21,7 @@
 
 <script>
     import Chart from 'chart.js'
+    import axios from 'axios'
 
     export default {
         name: "chartComponent",
@@ -18,15 +29,50 @@
             return {
                 process: true,
                 barChart: null,
+                allStats: [],
+                allTypes: [],
+                typeIds: null,
             }
         },
         methods: {
+            getStatistics: function() {
+                this.allStats = [];
+                let requestData = {
+                    "type_ids": this.typeIds
+                };
+                axios.post('/statistic', requestData)
+                .then(response => {
+                    if (response.status === 200) {
+                        this.allStats = response.data.statistic_languages;
+                        // console.log(response.data.statistic_languages[0])
+                        this.createChart();
+                    }
+                })
+                .catch(response => {
+                    console.log(response);
+                });
+            },
+
+            getTypes: async function () {
+                axios.get('/types')
+                .then(response => {
+                    if (response.status === 200) {
+                        this.allTypes = response.data.types;
+                        this.typeIds = response.data.types.map(obj => obj.id);
+                        this.getStatistics();
+                    }
+                })
+                .catch(response => {
+                    console.log(response);
+                });
+            },
+
             createChart: function () {
                 this.process = true;
                 this.barChart = new Chart(this.$refs.canvasChart, {
                     type: 'bar',
                     data: {
-                        labels: ['RU', 'EN'],
+                        labels: [this.allStats[0].name, this.allStats[1].name],
                         datasets: [{
                             label: 'Частота встречаемости',
                             backgroundColor: [
@@ -78,7 +124,7 @@
             }
         },
         mounted() {
-            this.createChart();
+            this.getTypes();
         }
     }
 </script>
@@ -88,5 +134,12 @@
         margin-top: 50px;
         width: 500px;
         height: 250px;
+    }
+    .mu-text-hide {
+        width: 500px;
+    }
+    .processIcon {
+        margin-top: 35px;
+        text-align: center;
     }
 </style>
