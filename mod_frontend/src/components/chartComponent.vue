@@ -1,6 +1,7 @@
 <template>
     <div id="chartBar">
-        <mu-select class="mu-text-hide" v-model="typeIds" multiple filerable help-text="Модальности" tags>
+        <mu-select class="mu-text-hide" v-model="typeIds" multiple filerable
+                   @change="getStatistics()" help-text="Модальности" tags>
 <!--            <template slot="selection" slot-scope="scope">-->
 <!--                <mu-chip :selected="scope.selected" color="teal">-->
 <!--                {{scope.label}}-->
@@ -10,11 +11,11 @@
         </mu-select>
 
         <div class="processIcon" v-show="process">
-          <mu-circular-progress class="demo-circular-progress" :size="52"></mu-circular-progress>
+            <mu-circular-progress class="demo-circular-progress" :size="52"></mu-circular-progress>
         </div>
 
         <div class="div-chart-canvas">
-          <canvas class="chartjs-render-monitor" ref="canvasChart"></canvas>
+            <canvas class="chartjs-render-monitor" ref="canvasChart"></canvas>
         </div>
     </div>
 </template>
@@ -45,7 +46,7 @@
                     if (response.status === 200) {
                         this.allStats = response.data.statistic_languages;
                         // console.log(response.data.statistic_languages[0])
-                        this.createChart();
+                        this.updateChart();
                     }
                 })
                 .catch(response => {
@@ -65,6 +66,13 @@
                 .catch(response => {
                     console.log(response);
                 });
+            },
+
+            updateChart: function () {
+                if (this.barChart) {
+                  this.barChart.destroy();
+                }
+                this.createChart();
             },
 
             createChart: function () {
@@ -90,7 +98,7 @@
                             pointBackgroundColor: 'white',
                             borderWidth: 1,
                             pointBorderColor: '#249EBF',
-                            data: [40, 70]
+                            data: [this.allStats[0].avg_count, this.allStats[1].avg_count]
                         }],
                     },
                     options: {
