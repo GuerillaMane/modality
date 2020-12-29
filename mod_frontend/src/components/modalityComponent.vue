@@ -92,11 +92,13 @@
             selectHighlightedText: function () {
                 let txtArea = document.getElementById("txt");
                 this.selectedText = txtArea.value.substring(txtArea.selectionStart, txtArea.selectionEnd);
+                console.log(txtArea.selectionStart);
                 console.log(this.selectedText);
             },
 
             chooseType: function (type) {
                 this.typeChoice = type;
+                this.closeMenu();
             },
 
             approveAdd: function () {
@@ -169,8 +171,8 @@
                     .then(response => {
                       if (response.status === 200) {
                         console.log(response.data);
-                        console.log('Протокол успешно создан');
-                        // this.result = 'Протокол успешно создан';
+                        console.log('Текст успешно добавлен');
+                        // this.result = 'Текст успешно добавлен';
                       }
                     })
                     .catch(response => {
