@@ -17,7 +17,8 @@
         </mu-row>
 
         <mu-row class="bottom-margin">
-            <textarea v-model="textString" id="txt" class="mod-text"></textarea>
+<!--            <textarea v-model="textString" id="txt" class="mod-text"></textarea>-->
+            <textarea v-model="currentText" id="txt" class="mod-text"></textarea>
         </mu-row>
 
         <mu-row class="bottom-margin">
@@ -37,13 +38,14 @@
 </template>
 
 <script>
-    import axios from 'axios'
+    import axios from 'axios';
+    import $ from 'jquery';
 
     export default {
         name: "modalityComponent",
         data: function () {
             return {
-                textString: '',
+                textString: 'Тала Иванова Зачем так худеть?!  Был такой брутальный , \nа сейчас....убитый вид... и очень ему не идет:( ﻿Lana Love Тала, ',
                 textData: {
                     text: null,
                     // url: null,
@@ -52,6 +54,10 @@
                     }
                 },
                 selectedText: '',
+
+                currentText: null,
+                currentModalities: null,
+                modalitiesObjectArray: null,
 
                 viewMenu: false,
                 top: '0px',
@@ -78,7 +84,10 @@
                 document.getElementById("txt").readOnly = "true";
                 this.editMode = false;
                 this.fixMode = true;
-                this.putText();
+                // this.putText();
+                this.getText(2);
+                this.getCurrentTextModalities(2);
+                this.highlightText();
             },
 
             nextText: function () {
@@ -92,11 +101,13 @@
             selectHighlightedText: function () {
                 let txtArea = document.getElementById("txt");
                 this.selectedText = txtArea.value.substring(txtArea.selectionStart, txtArea.selectionEnd);
+                console.log(txtArea.selectionStart);
                 console.log(this.selectedText);
             },
 
             chooseType: function (type) {
                 this.typeChoice = type;
+                this.closeMenu();
             },
 
             approveAdd: function () {
@@ -110,7 +121,7 @@
                     console.log(requestData);
                     axios.put('/modality', requestData)
                     .then(response => {
-                        if (response.statuc === 200) {
+                        if (response.status === 200) {
                             console.log(response.data);
                             this.cancelAdd();
                             // this.result = 'Добавлено успешно';
@@ -157,6 +168,32 @@
                 });
             },
 
+            getText: function (textId) {
+                axios.get(`text?id=${textId}`)
+                .then(response => {
+                    // console.log(response.data);
+                    this.currentText = response.data.text;
+                }).then(() => {
+                    this.highlightText();
+                })
+                .catch(error => {
+                    console.log(error.response.data.error);
+                })
+            },
+
+            getCurrentTextModalities: function (textId) {
+                axios.get(`modalities?id=${textId}`)
+                .then(response => {
+                    // console.log(response.data);
+                    this.modalitiesObjectArray = response.data.modalities;
+                    this.currentModalities = response.data.modalities.map(o => o.text);
+                    console.log(this.currentModalities);
+                })
+                .catch(error => {
+                    console.log(error.response.data.error);
+                })
+            },
+
             putText: function () {
                 let requestData = {
                     text: this.textString,
@@ -169,14 +206,25 @@
                     .then(response => {
                       if (response.status === 200) {
                         console.log(response.data);
-                        console.log('Протокол успешно создан');
-                        // this.result = 'Протокол успешно создан';
+                        console.log('Текст успешно добавлен');
+                        // this.result = 'Текст успешно добавлен';
                       }
                     })
                     .catch(response => {
                       console.log(response);
                       // this.errResult = response.response.data.error;
                     });
+            },
+
+            highlightText: function () {
+                $('.mod-text').highlightWithinTextarea({
+                    highlight: [
+                        {
+                            highlight: 'Lana',
+                            className: 'red'
+                        }
+                    ]
+                })
             },
 
             setMenu: function(top, left) {

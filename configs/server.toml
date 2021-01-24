@@ -1,6 +1,6 @@
 bind_addr = ":8080"
 log_level = "debug"
-database_url = "database/clear_modalnosti.db"
+database_url = "database/current_modalnosti.db"
 static_path = "static"
 prod = false
 console_log = true

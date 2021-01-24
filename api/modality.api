@@ -1,4 +1,6 @@
 ### add text
+###################################
+### DONE
 
 PUT http://localhost:8080/text HTTP/1.1
 content-type: application/json
@@ -12,12 +14,47 @@ content-type: application/json
 }
 
 ### get types
+###################################
+### DONE
 
 GET http://localhost:8080/types HTTP/1.1
 
 ### get languages
+###################################
+### DONE
 
 GET http://localhost:8080/langs HTTP/1.1
+
+### add modality
+###################################
+### DONE
+
+PUT http://localhost:8080/modality HTTP/1.1
+content-type: application/json
+
+{
+  "text": "картины перенесут в землю",
+  "type_id": 1,
+  "text_id": 2,
+  "start_symbol": 15
+}
+
+### get modality types statistic from languages
+###################################
+### DONE
+
+POST http://localhost:8080/statistic HTTP/1.1
+content-type: application/json
+
+{
+  "type_ids": 
+  [
+    1,
+    2,
+    3
+    
+  ]
+}
 
 ### get page texts
 
@@ -66,18 +103,6 @@ content-type: application/json
   }
 }
 
-### add modality
-
-PUT http://localhost:8080/modality HTTP/1.1
-content-type: application/json
-
-{
-  "text": "картины перенесут в землю",
-  "type_id": 1,
-  "text_id": 2,
-  "start_symbol": 15
-}
-
 ### get cur modality object
 
 GET http://localhost:8080/modality?id=1 HTTP/1.1
@@ -102,20 +127,5 @@ DELETE http://localhost:8080/modality?id=1 HTTP/1.1
 ### get all modalities from current text object
 
 GET http://localhost:8080/modalities?id=1 HTTP/1.1
-
-### get modality types statistic from languages
-
-POST http://localhost:8080/statistic HTTP/1.1
-content-type: application/json
-
-{
-  "type_ids": 
-  [
-    1,
-    2,
-    3
-    
-  ]
-}
 
 ### ...
