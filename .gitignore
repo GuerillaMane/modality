@@ -8,5 +8,4 @@
 *.sw?
 
 # temporarily adding static folder to .gitignore
-
-static/css/app.css
+static/
