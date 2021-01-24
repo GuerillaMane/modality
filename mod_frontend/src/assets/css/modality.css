@@ -224,4 +224,78 @@ button:hover {
 	color: inherit;
 }
 
+/* color classes for highlight property */
+
+.red {
+    background-color: #db5461;
+}
+
+.blue {
+    background-color: #5aa9e6;
+}
+
+.green {
+    background-color: greenyellow;
+}
+
+.yellow {
+    background-color: #FFFCBB;
+}
+
+.gray {
+    background-color: darkgray;
+}
+
+.purple {
+    background-color: #E47CCD;
+}
+
+.orange {
+    background-color: orange;
+}
+
+.mint {
+    background-color: #B5FBDD;
+}
+
+.peach {
+    background-color: #FBCEB5;
+}
+
+.violet {
+    background-color: #A771FE;
+}
+
+.brown {
+    background-color: #b76935;
+}
+
+.pink {
+    background-color: #ffc6ff;
+}
+
+.light-blue {
+    background-color: #a2d2ff;
+}
+
+.ginger {
+    background-color: #d4c685;
+}
+
+.light-red {
+    background-color: #ff7f5c;
+}
+
+.acid-green {
+    background-color: #abd45c;
+}
+
+.fluorescent-orange {
+    background-color: #ffd6a5;
+}
+
+.prune {
+    background-color: #bdb2ff;
+}
+
 /* end of css for highlight-within-textarea plugin */

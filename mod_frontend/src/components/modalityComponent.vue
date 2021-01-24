@@ -45,7 +45,7 @@
         name: "modalityComponent",
         data: function () {
             return {
-                textString: 'Тала Иванова Зачем так худеть?!  Был такой брутальный , \nа сейчас....убитый вид... и очень ему не идет:( ﻿Lana Love Тала, ',
+                textString: '',
                 textData: {
                     text: null,
                     // url: null,
@@ -73,6 +73,10 @@
                 editMode: true,
                 fixMode: false,
 
+                modalitiesColors: ['green', 'blue', 'light-red', 'yellow', 'violet', 'gray', 'purple', 'mint', 'ginger',
+                    'peach', 'brown', 'pink', 'light-blue', 'orange', 'red', 'acid-green', 'fluorescent-orange',
+                    'prune']
+
                 // currentUrl: '',
 
                 // result: null,
@@ -86,8 +90,6 @@
                 this.fixMode = true;
                 // this.putText();
                 this.getText(2);
-                this.getCurrentTextModalities(2);
-                this.highlightText();
             },
 
             nextText: function () {
@@ -173,8 +175,9 @@
                 .then(response => {
                     // console.log(response.data);
                     this.currentText = response.data.text;
-                }).then(() => {
-                    this.highlightText();
+                })
+                .then(() => {
+                    this.getCurrentTextModalities(textId);
                 })
                 .catch(error => {
                     console.log(error.response.data.error);
@@ -184,10 +187,13 @@
             getCurrentTextModalities: function (textId) {
                 axios.get(`modalities?id=${textId}`)
                 .then(response => {
-                    // console.log(response.data);
+                    // console.log(response.data.modalities);
                     this.modalitiesObjectArray = response.data.modalities;
                     this.currentModalities = response.data.modalities.map(o => o.text);
-                    console.log(this.currentModalities);
+                })
+                .then(() => {
+                    let indexArray = this.splitModalitiesByType();
+                    this.highlightText(indexArray);
                 })
                 .catch(error => {
                     console.log(error.response.data.error);
@@ -216,15 +222,31 @@
                     });
             },
 
-            highlightText: function () {
+            highlightText: function (highlight) {
                 $('.mod-text').highlightWithinTextarea({
-                    highlight: [
-                        {
-                            highlight: 'Lana',
-                            className: 'red'
-                        }
-                    ]
+                    highlight: highlight
                 })
+            },
+
+            splitModalitiesByType: function () {
+                let splittedModalitiesArray = [];
+                let tmpIndexArray = [];
+                for (let i = 1; i < 19; i++) {
+                    for (let obj of this.modalitiesObjectArray) {
+                        if (obj.type_id === i) {
+                            let lastSymbol = obj.start_symbol + obj.text.length - 1;
+                            tmpIndexArray.push([obj.start_symbol - 1, lastSymbol]);
+                        }
+                    }
+                    splittedModalitiesArray.push(
+                        {
+                            'highlight': tmpIndexArray,
+                            'className': this.modalitiesColors[i]
+                        }
+                    )
+                    tmpIndexArray = [];
+                }
+                return splittedModalitiesArray;
             },
 
             setMenu: function(top, left) {
