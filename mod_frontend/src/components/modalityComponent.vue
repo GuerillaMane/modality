@@ -1,39 +1,52 @@
 <template>
     <div id="app-modality" @contextmenu="openMenu">
-        <mu-row class="bottom-margin">
-            <mu-select v-model="currentLangId" style="width: 100px; margin-right: 30px">
-                <mu-option v-for="lang in allLanguages" :key="lang"
-                           :label="lang.name" :value="lang.id">
-                </mu-option>
-            </mu-select>
+        <div class="left-item">
+            <ul class="legend-li" v-if="currentText">
+                <li v-for="type in allTypes" :key="type">
+                    {{ type.name }}
+                </li>
+            </ul>
+        </div>
+        <div>
+            <mu-row class="bottom-margin">
+                <mu-select v-model="currentLangId" style="width: 100px; margin-right: 30px">
+                    <mu-option v-for="lang in allLanguages" :key="lang"
+                               :label="lang.name" :value="lang.id">
+                    </mu-option>
+                </mu-select>
 
-            <div v-if="typeChoice">
-                <mu-text-field v-model="typeChoice.name" type="text" readonly help-text="Выбранная модальность" style="width: 300px;">
-                </mu-text-field>
+                <div v-if="typeChoice">
+                    <mu-text-field v-model="typeChoice.name" type="text" readonly help-text="Выбранная модальность" style="width: 300px;">
+                    </mu-text-field>
 
-                <a class="create" @click.prevent="approveAdd" title="подтвердить"><font-awesome-icon icon="check-circle" /></a>
-                <a class="create" @click.prevent="cancelAdd" title="отмена"><font-awesome-icon icon="times-circle" /></a>
-            </div>
-        </mu-row>
+                    <a class="create" @click.prevent="approveAdd" title="подтвердить"><font-awesome-icon icon="check-circle" /></a>
+                    <a class="create" @click.prevent="cancelAdd" title="отмена"><font-awesome-icon icon="times-circle" /></a>
+                </div>
+            </mu-row>
 
-        <mu-row class="bottom-margin">
-<!--            <textarea v-model="textString" id="txt" class="mod-text"></textarea>-->
-            <textarea v-model="currentText" id="txt" class="mod-text"></textarea>
-        </mu-row>
+            <mu-row class="bottom-margin">
+<!--                <textarea v-model="textString" id="txt" class="mod-text"></textarea>-->
+                <textarea v-model="currentText" id="txt" class="mod-text"></textarea>
+            </mu-row>
 
-        <mu-row class="bottom-margin">
-            <button v-if="editMode" class="def-button" @click.prevent="fixText">Сохранить</button>
-            <button v-if="fixMode" class="def-button" @click.prevent="nextText">След.</button>
-        </mu-row>
+            <mu-row class="bottom-margin">
+                <button v-if="editMode" class="def-button" @click.prevent="fixText">Сохранить</button>
+                <button v-if="fixMode" class="def-button" @click.prevent="nextText">След.</button>
+            </mu-row>
 
-        <ul id="right-click-menu" tabindex="-1" ref="right" v-if="viewMenu"
-            @blur="closeMenu" :style="{top:top, left:left}">
-            <li v-for="type in allTypes" :key="type" @click="chooseType(type); selectHighlightedText()">
-                {{ type.name }}
-            </li>
-        </ul>
+            <ul id="right-click-menu" tabindex="-1" ref="right" v-if="viewMenu"
+                @blur="closeMenu" :style="{top:top, left:left}">
+                <li v-for="type in allTypes" :key="type" @click="chooseType(type); selectHighlightedText()">
+                    {{ type.name }}
+                </li>
+            </ul>
+        </div>
+
 <!--        <div v-if="result"><h5>{{result}}</h5></div>-->
 <!--        <div v-if="errResult"><h5 class="orange-text">{{errResult}}</h5></div>-->
+
+        <div class="right-item">
+        </div>
     </div>
 </template>
 
@@ -73,7 +86,7 @@
                 editMode: true,
                 fixMode: false,
 
-                modalitiesColors: ['green', 'blue', 'light-red', 'yellow', 'violet', 'gray', 'purple', 'mint', 'ginger',
+                modalitiesColors: ['green', 'light-red', 'blue', 'yellow', 'violet', 'gray', 'mint', 'purple', 'ginger',
                     'peach', 'brown', 'pink', 'light-blue', 'orange', 'red', 'acid-green', 'fluorescent-orange',
                     'prune']
 
@@ -161,9 +174,8 @@
             getTypes: function () {
                 axios.get('/types')
                 .then(response => {
-                    if (response.status === 200) {
-                        this.allTypes = response.data.types;
-                    }
+                    console.log(response.data.types)
+                    this.allTypes = response.data.types;
                 })
                 .catch(response => {
                     console.log(response);
@@ -189,7 +201,7 @@
                 .then(response => {
                     // console.log(response.data.modalities);
                     this.modalitiesObjectArray = response.data.modalities;
-                    this.currentModalities = response.data.modalities.map(o => o.text);
+                    // this.currentModalities = response.data.modalities.map(o => o.text);
                 })
                 .then(() => {
                     let indexArray = this.splitModalitiesByType();
@@ -241,9 +253,9 @@
                     splittedModalitiesArray.push(
                         {
                             'highlight': tmpIndexArray,
-                            'className': this.modalitiesColors[i]
+                            'className': this.modalitiesColors[i-1]
                         }
-                    )
+                    );
                     tmpIndexArray = [];
                 }
                 return splittedModalitiesArray;

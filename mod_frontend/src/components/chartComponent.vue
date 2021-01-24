@@ -138,6 +138,11 @@
 </script>
 
 <style scoped>
+    #chartBar {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
     .div-chart-canvas {
         margin-top: 50px;
         width: 500px;

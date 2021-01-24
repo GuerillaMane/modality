@@ -1,11 +1,11 @@
-#app-private {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding-bottom: 30px;
-    margin-bottom: 40px;
-}
+/*#app-private {*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
+/*    justify-content: center;*/
+/*    align-items: center;*/
+/*    padding-bottom: 30px;*/
+/*    margin-bottom: 40px;*/
+/*}*/
 
 * {
     font-family: Arial, Helvetica, sans-serif;
@@ -21,6 +21,32 @@ body {
 html {
     position:relative;
     min-height:100%;
+}
+
+#app-modality {
+    display: flex;
+    flex-direction: row;
+}
+
+.left-item {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.center-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.right-item {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 a{
@@ -74,7 +100,7 @@ header ul a:hover{
 
 .wrap{
     max-width: 70%;
-    margin:auto;
+    /*margin:auto;*/
 }
 
 .mod-text {
@@ -143,7 +169,7 @@ button:hover {
 }
 
 .dropdown {
-    float: left;
+    float: right;
 }
 
 .dropdown ul {
@@ -299,3 +325,37 @@ button:hover {
 }
 
 /* end of css for highlight-within-textarea plugin */
+
+::marker {
+    content: "▅";
+    font-size: 2em;
+
+    --hue: greenyellow;
+    color: var(--hue)
+}
+
+.legend-li li{
+    padding-inline-start: 1ch;
+}
+
+.legend-li li:nth-child(2)::marker {--hue: #ff7f5c}
+.legend-li li:nth-child(3)::marker {--hue: #5aa9e6}
+.legend-li li:nth-child(4)::marker {--hue: #FFFCBB}
+.legend-li li:nth-child(5)::marker {--hue: #A771FE}
+.legend-li li:nth-child(6)::marker {--hue: darkgray}
+.legend-li li:nth-child(7)::marker {--hue: #B5FBDD}
+.legend-li li:nth-child(8)::marker {--hue: #E47CCD}
+.legend-li li:nth-child(9)::marker {--hue: #d4c685}
+.legend-li li:nth-child(10)::marker {--hue: #FBCEB5}
+.legend-li li:nth-child(11)::marker {--hue: #b76935}
+.legend-li li:nth-child(12)::marker {--hue: #ffc6ff}
+.legend-li li:nth-child(13)::marker {--hue: #a2d2ff}
+.legend-li li:nth-child(14)::marker {--hue: orange}
+.legend-li li:nth-child(15)::marker {--hue: #db5461}
+.legend-li li:nth-child(16)::marker {--hue: #abd45c}
+.legend-li li:nth-child(17)::marker {--hue: #ffd6a5}
+.legend-li li:nth-child(18)::marker {--hue: #bdb2ff}
+
+.legend-li ul, ol {
+  max-width: 30ch;
+}
