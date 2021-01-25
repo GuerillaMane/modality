@@ -1,7 +1,8 @@
-import VueRouter from 'vue-router'
-import mainComponent from "../components/mainComponent"
-import modalityComponent from "../components/modalityComponent"
-import chartComponent from "../components/chartComponent"
+import VueRouter from 'vue-router';
+import mainComponent from "../components/mainComponent";
+import modalityComponent from "../components/modalityComponent";
+import textPageComponent from "../components/textPageComponent";
+import chartComponent from "../components/chartComponent";
 
 /* eslint-disable no-console */
 // eslint-disable-next-line no-unused-vars
@@ -16,6 +17,11 @@ const router =  new VueRouter({
           path: 'modality',
           name: 'Модальности',
           component: modalityComponent
+        },
+        {
+          path: 'texts',
+          name: 'Список текстов',
+          component: textPageComponent
         },
         {
           path: 'charts',

@@ -1,5 +1,5 @@
 <template>
-    <div id="chartBar">
+    <div id="chart-bar" class="app-component-column">
         <mu-select class="mu-text-hide" v-model="typeIds" multiple filerable
                    @change="getStatistics()" help-text="Модальности" tags>
 <!--            <template slot="selection" slot-scope="scope">-->
@@ -10,7 +10,7 @@
             <mu-option v-for="type in allTypes" :key="type" :label="type.name" :value="type.id"></mu-option>
         </mu-select>
 
-        <div class="processIcon" v-show="process">
+        <div class="process-icon" v-show="process">
             <mu-circular-progress class="demo-circular-progress" :size="52"></mu-circular-progress>
         </div>
 
@@ -138,21 +138,5 @@
 </script>
 
 <style scoped>
-    #chartBar {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-    .div-chart-canvas {
-        margin-top: 50px;
-        width: 500px;
-        height: 250px;
-    }
-    .mu-text-hide {
-        width: 500px;
-    }
-    .processIcon {
-        margin-top: 35px;
-        text-align: center;
-    }
+
 </style>
