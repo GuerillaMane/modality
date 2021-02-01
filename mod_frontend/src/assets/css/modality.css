@@ -12,20 +12,28 @@
     font-size: 14px;
     color: #6F6F6F;
 }
+
 body {
     background-color: #F2F2F2;
     margin: 0;
     padding: 0;
     min-height: 100%;
 }
+
 html {
     position:relative;
     min-height:100%;
 }
 
-#app-modality {
+.app-component {
     display: flex;
     flex-direction: row;
+}
+
+.app-component-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .left-item {
@@ -54,6 +62,7 @@ a{
     color: white;
     cursor: pointer;
 }
+
 a:visited{
     text-decoration: none;
 }
@@ -77,6 +86,7 @@ header ul li{
     color:white;
     padding:10px;
 }
+
 header ul a{
     text-decoration:none;
     padding:10px 2px 10px 2px;
@@ -86,6 +96,7 @@ header ul a{
     -o-transition: all 500ms ease;
     transition: all 500ms ease;
 }
+
 header ul a:hover{
     cursor: pointer;
     background-color:#098E9A;
@@ -98,9 +109,94 @@ header ul a:hover{
     transition: all 500ms ease;
 }
 
+.router-link-active {
+    font-weight: bold;
+}
+
 .wrap{
     max-width: 70%;
     /*margin:auto;*/
+}
+
+.card-table {
+    background-color: #ffffff;
+    margin: 0 0 30px 0;
+    padding: 40px 40px 20px 40px;
+    position: relative;
+    box-shadow: 2px 2px 2px lightgrey;
+    width: 1230px;
+}
+
+.text-table {
+    color:#646465;
+    border-collapse: collapse !important;
+    border-spacing: 0 !important;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.text-table td{
+    border-bottom:1px solid rgba(202,215,226,0.5);
+    text-align:center;
+}
+
+.text-table th{
+    padding: 10px 15px;
+    font-weight: normal !important;
+    border-bottom:1px solid rgba(62,171,191,.7);
+    text-align:center;
+    background-color: rgba(127,196,202,0.1);
+}
+
+.text-table tr:hover{
+    background-color: rgba(127,196,202,0.1);
+}
+
+.text-table td{
+    padding: 4px 0;
+}
+
+.div-chart-canvas {
+    margin-top: 50px;
+    width: 500px;
+    height: 250px;
+}
+
+.bottom-margin {
+    margin-bottom: 30px;
+}
+
+.mu-input {
+    margin-bottom: 5px;
+    width: 190px;
+    margin-right: 32px;
+}
+
+.mu-input-focus-line {
+    background-color: #7FC4CA !important;
+}
+
+.mu-text-field-input {
+    color: #6F6F6F !important;
+}
+
+.mu-input-help div {
+    font-size: 12px !important;
+}
+
+.mu-text-hide {
+    width: 500px;
+}
+
+.process-icon {
+    margin-top: 35px;
+    text-align: center;
+}
+
+.error-response {
+    margin-top: 30px;
+    margin-bottom: 30px;
+
 }
 
 .mod-text {
@@ -123,6 +219,7 @@ button{
     border-radius: 0.2rem;
     cursor: pointer;
 }
+
 button:hover {
     background-color: #098E9A;
 }
@@ -185,11 +282,61 @@ button:hover {
     margin-left: 10px;
     margin-top: 10px;
 }
+
 .create path {
     fill: #cccccc !important;
 }
 .create path:hover {
     fill: #6f6f6f !important;
+}
+
+.filter_user_radio {
+    display: flex;
+    flex-direction: row;
+    margin: 0 0 0 22px;
+    text-align: center;
+}
+
+.filter_user_radio input {
+    display: none;
+}
+
+.filter_user_radio label {
+    cursor: pointer;
+}
+
+.radio_div span {
+  display: block;
+  padding: 4px 10px 5px 20px;
+  border-radius: 5px;
+  position: relative;
+  transition: all 0.25s linear;
+}
+
+.radio_div span:before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 50%;
+  -webkit-transform: translatey(-50%);
+          transform: translatey(-50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #ddd;
+  transition: all 0.25s linear;
+}
+
+.radio_div input:checked + span {
+  background-color: #fff;
+}
+
+.radio_div .pg-num input:checked + span {
+  color: #7FC4CA;
+}
+
+.radio_div .pg-num input:checked + span:before {
+  background-color: #7FC4CA;
 }
 
 /* css for highlight-within-textarea plugin */

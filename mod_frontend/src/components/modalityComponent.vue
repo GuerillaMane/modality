@@ -1,5 +1,5 @@
 <template>
-    <div id="app-modality" @contextmenu="openMenu">
+    <div id="app-modality" class="app-component">
         <div class="left-item">
             <ul class="legend-li" v-if="currentText">
                 <li v-for="type in allTypes" :key="type">
@@ -24,7 +24,7 @@
                 </div>
             </mu-row>
 
-            <mu-row class="bottom-margin">
+            <mu-row class="bottom-margin" @contextmenu="openMenu">
 <!--                <textarea v-model="textString" id="txt" class="mod-text"></textarea>-->
                 <textarea v-model="currentText" id="txt" class="mod-text"></textarea>
             </mu-row>
@@ -308,7 +308,5 @@
 </script>
 
 <style scoped>
-    .bottom-margin {
-        margin-bottom: 25px;
-    }
+
 </style>

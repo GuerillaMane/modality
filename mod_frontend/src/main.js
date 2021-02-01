@@ -7,11 +7,11 @@ import MuseUI from 'muse-ui';
 import 'muse-ui/dist/muse-ui.css';
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 import {library} from '@fortawesome/fontawesome-svg-core';
-import {faTimesCircle, faCheckCircle} from '@fortawesome/free-solid-svg-icons';
+import {faTimesCircle, faCheckCircle, faPencilAlt, faTrashAlt} from '@fortawesome/free-solid-svg-icons';
 
 Vue.use(MuseUI);
 Vue.use(VueRouter);
-library.add(faCheckCircle, faTimesCircle);
+library.add(faCheckCircle, faTimesCircle, faPencilAlt, faTrashAlt);
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.config.productionTip = false;
 
