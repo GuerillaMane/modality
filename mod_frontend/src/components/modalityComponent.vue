@@ -104,7 +104,6 @@
                 this.editMode = false;
                 this.fixMode = true;
                 this.putText();
-                // this.getText(2);
             },
 
             nextText: function () {
@@ -138,11 +137,9 @@
                         text_id: this.currentTextId,
                         start_symbol: this.selectedModalityStart
                     };
-                    console.log(requestData);
                     axios.put('/modality', requestData)
                     .then(response => {
                         if (response.status === 200) {
-                            console.log(response.data);
                             this.getText(this.currentTextId);
                             this.cancelAdd();
                             // this.result = 'Добавлено успешно';
@@ -181,7 +178,6 @@
             getTypes: function () {
                 axios.get('/types')
                 .then(response => {
-                    console.log(response.data.types)
                     this.allTypes = response.data.types;
                 })
                 .catch(response => {
@@ -192,7 +188,6 @@
             getText: function (textId) {
                 axios.get(`text?id=${textId}`)
                 .then(response => {
-                    // console.log(response.data);
                     this.currentText = response.data.text;
                 })
                 .then(() => {
@@ -206,7 +201,6 @@
             getCurrentTextModalities: function (textId) {
                 axios.get(`modalities?id=${textId}`)
                 .then(response => {
-                    // console.log(response.data.modalities);
                     this.modalitiesObjectArray = response.data.modalities;
                     // this.currentModalities = response.data.modalities.map(o => o.text);
                 })
@@ -227,22 +221,24 @@
                         id: this.currentLangId
                     }
                 }
-                axios.put('/text', requestData)
-                    .then(response => {
-                      if (response.status === 200) {
-                        this.currentTextId = response.data.id;
-                        console.log(response.data.id);
-                        console.log('Текст успешно добавлен');
-                        // this.result = 'Текст успешно добавлен';
-                      }
-                    })
-                    .then(() => {
+                if (this.currentLangId) {
+                    axios.put('/text', requestData)
+                        .then(response => {
+                            if (response.status === 200) {
+                                this.currentTextId = response.data.id;
+                                // this.result = 'Текст успешно добавлен';
+                            }
+                        })
+                        .then(() => {
 
-                    })
-                    .catch(response => {
-                      console.log(response);
-                      // this.errResult = response.response.data.error;
-                    });
+                        })
+                        .catch(response => {
+                            console.log(response);
+                            // this.errResult = response.response.data.error;
+                        });
+                } else {
+                    // this.errResult = 'Выберите язык данного текста'
+                }
             },
 
             highlightText: function (highlight) {
