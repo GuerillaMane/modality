@@ -58,7 +58,7 @@
         name: "modalityComponent",
         data: function () {
             return {
-                textString: '',
+                // textString: '',
                 textData: {
                     text: null,
                     // url: null,
@@ -67,8 +67,10 @@
                     }
                 },
                 selectedText: '',
+                selectedModalityStart: null,
 
                 currentText: null,
+                currentTextId: null,
                 currentModalities: null,
                 modalitiesObjectArray: null,
 
@@ -101,13 +103,15 @@
                 document.getElementById("txt").readOnly = "true";
                 this.editMode = false;
                 this.fixMode = true;
-                // this.putText();
-                this.getText(2);
+                this.putText();
+                // this.getText(2);
             },
 
             nextText: function () {
                 this.typeChoice = null;
-                this.textString = '';
+                this.currentText = '';
+                this.currentTextId = null;
+                $('.mod-text').highlightWithinTextarea('destroy');
                 document.getElementsByTagName("textarea")[0].readOnly = false;
                 this.fixMode = false;
                 this.editMode = true;
@@ -116,8 +120,9 @@
             selectHighlightedText: function () {
                 let txtArea = document.getElementById("txt");
                 this.selectedText = txtArea.value.substring(txtArea.selectionStart, txtArea.selectionEnd);
-                console.log(txtArea.selectionStart);
-                console.log(this.selectedText);
+                this.selectedModalityStart = txtArea.selectionStart;
+                // console.log(txtArea.selectionStart);
+                // console.log(this.selectedText);
             },
 
             chooseType: function (type) {
@@ -130,14 +135,15 @@
                     let requestData = {
                         text: this.selectedText,
                         type_id: this.typeChoice.id,
-                        text_id: null,
-                        start_symbol: null
+                        text_id: this.currentTextId,
+                        start_symbol: this.selectedModalityStart
                     };
                     console.log(requestData);
                     axios.put('/modality', requestData)
                     .then(response => {
                         if (response.status === 200) {
                             console.log(response.data);
+                            this.getText(this.currentTextId);
                             this.cancelAdd();
                             // this.result = 'Добавлено успешно';
                             // const self = this;
@@ -157,6 +163,7 @@
                 // this.errResult = null;
                 this.typeChoice = null;
                 this.selectedText = '';
+                this.selectedModalityStart = null;
             },
 
             getLanguages: function () {
@@ -214,7 +221,7 @@
 
             putText: function () {
                 let requestData = {
-                    text: this.textString,
+                    text: this.currentText,
                     // url: this.currentUrl,
                     lang: {
                         id: this.currentLangId
@@ -223,10 +230,14 @@
                 axios.put('/text', requestData)
                     .then(response => {
                       if (response.status === 200) {
-                        console.log(response.data);
+                        this.currentTextId = response.data.id;
+                        console.log(response.data.id);
                         console.log('Текст успешно добавлен');
                         // this.result = 'Текст успешно добавлен';
                       }
+                    })
+                    .then(() => {
+
                     })
                     .catch(response => {
                       console.log(response);
