@@ -57,6 +57,8 @@ content-type: application/json
 }
 
 ### get page texts
+###################################
+### DONE
 
 POST http://localhost:8080/texts HTTP/1.1
 content-type: application/json
@@ -81,13 +83,17 @@ content-type: application/json
   ]
 }
 
-### get cur text object
-
-GET http://localhost:8080/text?id=2 HTTP/1.1
-
 ### delete cur text object
+###################################
+### DONE
 
 DELETE http://localhost:8080/text?id=1 HTTP/1.1
+
+### get cur text object
+###################################
+### ALMOST DONE
+
+GET http://localhost:8080/text?id=2 HTTP/1.1
 
 ### update current text
 
@@ -125,6 +131,8 @@ content-type: application/json
 DELETE http://localhost:8080/modality?id=1 HTTP/1.1
 
 ### get all modalities from current text object
+###################################
+### DONE
 
 GET http://localhost:8080/modalities?id=1 HTTP/1.1
 

@@ -277,6 +277,10 @@ button:hover {
     color: #fca83a !important;
 }
 
+.red-text {
+    color: red;
+}
+
 .create {
     cursor: pointer;
     margin-left: 10px;
@@ -288,6 +292,11 @@ button:hover {
 }
 .create path:hover {
     fill: #6f6f6f !important;
+}
+
+.del-button {
+    width: 80px !important;
+    margin-left: 3%;
 }
 
 .filter_user_radio {

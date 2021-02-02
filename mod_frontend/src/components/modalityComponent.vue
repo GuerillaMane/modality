@@ -24,6 +24,14 @@
                 </div>
             </mu-row>
 
+            <mu-row v-if="result" class="error-response" justify-content="center">
+                <span class="orange-text">{{result}}</span>
+            </mu-row>
+
+            <mu-row v-if="errResult" class="error-response" justify-content="center">
+                <span class="red-text">{{errResult}}</span>
+            </mu-row>
+
             <mu-row class="bottom-margin" @contextmenu="openMenu">
 <!--                <textarea v-model="textString" id="txt" class="mod-text"></textarea>-->
                 <textarea v-model="currentText" id="txt" class="mod-text"></textarea>
@@ -51,6 +59,8 @@
 </template>
 
 <script>
+    /* eslint-disable no-unused-vars */
+
     import axios from 'axios';
     import $ from 'jquery';
 
@@ -90,20 +100,28 @@
 
                 modalitiesColors: ['green', 'light-red', 'blue', 'yellow', 'violet', 'gray', 'mint', 'purple', 'ginger',
                     'peach', 'brown', 'pink', 'light-blue', 'orange', 'red', 'acid-green', 'fluorescent-orange',
-                    'prune']
+                    'prune'],
 
                 // currentUrl: '',
 
-                // result: null,
-                // errResult: null,
+                result: null,
+                errResult: null,
             }
         },
         methods: {
             fixText: function () {
-                document.getElementById("txt").readOnly = "true";
-                this.editMode = false;
-                this.fixMode = true;
-                this.putText();
+                if (this.currentLangId) {
+                    document.getElementById("txt").readOnly = "true";
+                    this.editMode = false;
+                    this.fixMode = true;
+                    this.putText();
+                } else {
+                    this.errResult = 'Выберите язык данного текста';
+                    const self = this;
+                    setTimeout(function () {
+                        self.errResult = null;
+                    }, 2000);
+                }
             },
 
             nextText: function () {
@@ -142,22 +160,22 @@
                         if (response.status === 200) {
                             this.getText(this.currentTextId);
                             this.cancelAdd();
-                            // this.result = 'Добавлено успешно';
-                            // const self = this;
-                            // setTimeout(function () {
-                            //     self.result = null;
-                            // }, 2000);
+                            this.result = 'Добавлено успешно';
+                            const self = this;
+                            setTimeout(function () {
+                                self.result = null;
+                            }, 2000);
                         }
                     })
                     .catch(response => {
-                        console.log(response);
-                        // this.errResult = 'Ошибка добавления';
+                        // console.log(response);
+                        this.errResult = 'Ошибка добавления';
                     })
                 }
             },
 
             cancelAdd: function () {
-                // this.errResult = null;
+                this.errResult = null;
                 this.typeChoice = null;
                 this.selectedText = '';
                 this.selectedModalityStart = null;
@@ -221,24 +239,24 @@
                         id: this.currentLangId
                     }
                 }
-                if (this.currentLangId) {
-                    axios.put('/text', requestData)
-                        .then(response => {
-                            if (response.status === 200) {
-                                this.currentTextId = response.data.id;
-                                // this.result = 'Текст успешно добавлен';
-                            }
-                        })
-                        .then(() => {
+                axios.put('/text', requestData)
+                    .then(response => {
+                        if (response.status === 200) {
+                            this.currentTextId = response.data.id;
+                            this.result = 'Текст успешно добавлен';
+                            const self = this;
+                            setTimeout(function () {
+                                self.result = null;
+                            }, 2000);
+                        }
+                    })
+                    .then(() => {
 
-                        })
-                        .catch(response => {
-                            console.log(response);
-                            // this.errResult = response.response.data.error;
-                        });
-                } else {
-                    // this.errResult = 'Выберите язык данного текста'
-                }
+                    })
+                    .catch(response => {
+                        // console.log(response);
+                        this.errResult = response.response.data.error;
+                    });
             },
 
             highlightText: function (highlight) {
