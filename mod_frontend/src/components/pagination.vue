@@ -1,7 +1,7 @@
 <template>
     <div id="pagination">
-        <div class="filter_user_radio radio_div pagination" v-if="pageQuantity > 1">
-            <span class="pg-num" v-if="currentPage > 2"><a @click="previousPage">назад</a></span>
+        <div class="filter_user_radio radio_div pagination" v-if="pageQuantity>1">
+            <span class="pg-num" v-if="currentPage>2"><a @click="previousPage">назад</a></span>
 
             <label v-for="page in pageQuantity" :key="page" class="pg-num">
 <!--                <div v-if="page < currentPage - 1"></div>-->

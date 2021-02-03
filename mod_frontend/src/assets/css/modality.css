@@ -54,7 +54,7 @@ html {
     flex: 1;
     display: flex;
     justify-content: center;
-    align-items: center;
+    /*align-items: center;*/
 }
 
 a{
@@ -229,6 +229,12 @@ button:hover {
     margin-left:auto;
 }
 
+.text-button {
+    width: 120px;
+    height: 30px;
+    margin-top: 250px;
+}
+
 #right-click-menu{
     background: #FAFAFA;
     border: 1px solid #7FC4CA;
@@ -277,6 +283,10 @@ button:hover {
     color: #fca83a !important;
 }
 
+.red-text {
+    color: red;
+}
+
 .create {
     cursor: pointer;
     margin-left: 10px;
@@ -286,8 +296,33 @@ button:hover {
 .create path {
     fill: #cccccc !important;
 }
+
 .create path:hover {
     fill: #6f6f6f !important;
+}
+
+.close {
+    cursor: pointer;
+    float: right;
+}
+
+.close {
+    cursor: pointer;
+    float: right;
+    margin-top: -10px;
+}
+
+.close path {
+    fill: #cccccc !important;
+}
+
+.close path:hover {
+    fill: #6f6f6f !important;
+}
+
+.del-button {
+    width: 80px !important;
+    margin-left: 3%;
 }
 
 .filter_user_radio {

@@ -15,17 +15,29 @@
                     </mu-option>
                 </mu-select>
 
-                <div v-if="typeChoice">
-                    <mu-text-field v-model="typeChoice.name" type="text" readonly help-text="Выбранная модальность" style="width: 300px;">
-                    </mu-text-field>
+<!--                <div v-if="typeChoice">-->
+<!--                    <mu-text-field v-model="typeChoice.name" type="text" readonly help-text="Выбранная модальность"-->
+<!--                                   style="width: 300px;">-->
+<!--                    </mu-text-field>-->
 
-                    <a class="create" @click.prevent="approveAdd" title="подтвердить"><font-awesome-icon icon="check-circle" /></a>
-                    <a class="create" @click.prevent="cancelAdd" title="отмена"><font-awesome-icon icon="times-circle" /></a>
-                </div>
+<!--                    <a class="create" @click.prevent="approveAdd" title="подтвердить">-->
+<!--                        <font-awesome-icon icon="check-circle" />-->
+<!--                    </a>-->
+<!--                    <a class="create" @click.prevent="cancelAdd" title="отмена">-->
+<!--                        <font-awesome-icon icon="times-circle" />-->
+<!--                    </a>-->
+<!--                </div>-->
+            </mu-row>
+
+<!--            <mu-row v-if="result" class="error-response" justify-content="center">-->
+<!--                <span class="orange-text">{{result}}</span>-->
+<!--            </mu-row>-->
+
+            <mu-row v-if="errResult" class="error-response" justify-content="center">
+                <span class="red-text">{{errResult}}</span>
             </mu-row>
 
             <mu-row class="bottom-margin" @contextmenu="openMenu">
-<!--                <textarea v-model="textString" id="txt" class="mod-text"></textarea>-->
                 <textarea v-model="currentText" id="txt" class="mod-text"></textarea>
             </mu-row>
 
@@ -42,20 +54,29 @@
             </ul>
         </div>
 
-<!--        <div v-if="result"><h5>{{result}}</h5></div>-->
-<!--        <div v-if="errResult"><h5 class="orange-text">{{errResult}}</h5></div>-->
-
         <div class="right-item">
+            <mu-row>
+                <button class="text-button" @click="openTexts=true">Список текстов</button>
+            </mu-row>
         </div>
+
+        <text-page-component v-if="openTexts" :open="openTexts"
+                @getText="getText" @close="openTexts=false">
+        </text-page-component>
     </div>
 </template>
 
 <script>
+    /* eslint-disable no-unused-vars */
+
     import axios from 'axios';
     import $ from 'jquery';
 
     export default {
         name: "modalityComponent",
+        components: {
+            textPageComponent: () => import('./textPageComponent.vue')
+        },
         data: function () {
             return {
                 // textString: '',
@@ -85,32 +106,44 @@
                 allLanguages: null,
                 currentLangId: null,
 
+                openTexts: false,
+                textHighlighted: false,
+
                 editMode: true,
                 fixMode: false,
 
                 modalitiesColors: ['green', 'light-red', 'blue', 'yellow', 'violet', 'gray', 'mint', 'purple', 'ginger',
                     'peach', 'brown', 'pink', 'light-blue', 'orange', 'red', 'acid-green', 'fluorescent-orange',
-                    'prune']
+                    'prune'],
 
                 // currentUrl: '',
 
                 // result: null,
-                // errResult: null,
+                errResult: null,
             }
         },
         methods: {
             fixText: function () {
-                document.getElementById("txt").readOnly = "true";
-                this.editMode = false;
-                this.fixMode = true;
-                this.putText();
+                if (this.currentLangId) {
+                    document.getElementById("txt").readOnly = "true";
+                    this.editMode = false;
+                    this.fixMode = true;
+                    this.putText();
+                } else {
+                    this.errResult = 'Выберите язык данного текста';
+                    const self = this;
+                    setTimeout(function () {
+                        self.errResult = null;
+                    }, 2000);
+                }
             },
 
             nextText: function () {
                 this.typeChoice = null;
                 this.currentText = '';
                 this.currentTextId = null;
-                $('.mod-text').highlightWithinTextarea('destroy');
+                this.currentLangId = null;
+                this.destroyTextHighlight(this.textHighlighted);
                 document.getElementsByTagName("textarea")[0].readOnly = false;
                 this.fixMode = false;
                 this.editMode = true;
@@ -120,12 +153,12 @@
                 let txtArea = document.getElementById("txt");
                 this.selectedText = txtArea.value.substring(txtArea.selectionStart, txtArea.selectionEnd);
                 this.selectedModalityStart = txtArea.selectionStart;
-                // console.log(txtArea.selectionStart);
-                // console.log(this.selectedText);
+
             },
 
             chooseType: function (type) {
                 this.typeChoice = type;
+                this.approveAdd();
                 this.closeMenu();
             },
 
@@ -142,22 +175,17 @@
                         if (response.status === 200) {
                             this.getText(this.currentTextId);
                             this.cancelAdd();
-                            // this.result = 'Добавлено успешно';
-                            // const self = this;
-                            // setTimeout(function () {
-                            //     self.result = null;
-                            // }, 2000);
                         }
                     })
                     .catch(response => {
-                        console.log(response);
-                        // this.errResult = 'Ошибка добавления';
+                        // console.log(response);
+                        this.errResult = 'Ошибка добавления';
                     })
                 }
             },
 
             cancelAdd: function () {
-                // this.errResult = null;
+                this.errResult = null;
                 this.typeChoice = null;
                 this.selectedText = '';
                 this.selectedModalityStart = null;
@@ -186,9 +214,15 @@
             },
 
             getText: function (textId) {
+                this.currentLangId = null;
                 axios.get(`text?id=${textId}`)
                 .then(response => {
+                    console.log(response);
                     this.currentText = response.data.text;
+                    this.currentTextId = response.data.id;
+                    this.currentLangId = response.data.lang.id;
+                    this.editMode = false;
+                    this.fixMode = true;
                 })
                 .then(() => {
                     this.getCurrentTextModalities(textId);
@@ -205,8 +239,11 @@
                     // this.currentModalities = response.data.modalities.map(o => o.text);
                 })
                 .then(() => {
+                    this.destroyTextHighlight(this.textHighlighted);
                     let indexArray = this.splitModalitiesByType();
-                    this.highlightText(indexArray);
+                    if (indexArray) {
+                        this.highlightText(indexArray);
+                    }
                 })
                 .catch(error => {
                     console.log(error.response.data.error);
@@ -221,51 +258,58 @@
                         id: this.currentLangId
                     }
                 }
-                if (this.currentLangId) {
-                    axios.put('/text', requestData)
-                        .then(response => {
-                            if (response.status === 200) {
-                                this.currentTextId = response.data.id;
-                                // this.result = 'Текст успешно добавлен';
-                            }
-                        })
-                        .then(() => {
+                axios.put('/text', requestData)
+                    .then(response => {
+                        if (response.status === 200) {
+                            this.currentTextId = response.data.id;
 
-                        })
-                        .catch(response => {
-                            console.log(response);
-                            // this.errResult = response.response.data.error;
-                        });
-                } else {
-                    // this.errResult = 'Выберите язык данного текста'
-                }
+                        }
+                    })
+                    .then(() => {
+
+                    })
+                    .catch(response => {
+                        // console.log(response);
+                        this.errResult = response.response.data.error;
+                    });
             },
 
             highlightText: function (highlight) {
+                this.textHighlighted = true;
                 $('.mod-text').highlightWithinTextarea({
                     highlight: highlight
                 })
             },
 
-            splitModalitiesByType: function () {
-                let splittedModalitiesArray = [];
-                let tmpIndexArray = [];
-                for (let i = 1; i < 19; i++) {
-                    for (let obj of this.modalitiesObjectArray) {
-                        if (obj.type_id === i) {
-                            let lastSymbol = obj.start_symbol + obj.text.length - 1;
-                            tmpIndexArray.push([obj.start_symbol - 1, lastSymbol]);
-                        }
-                    }
-                    splittedModalitiesArray.push(
-                        {
-                            'highlight': tmpIndexArray,
-                            'className': this.modalitiesColors[i-1]
-                        }
-                    );
-                    tmpIndexArray = [];
+            destroyTextHighlight: function (isHighlighted) {
+                if (isHighlighted) {
+                    $('.mod-text').highlightWithinTextarea('destroy');
+                    this.textHighlighted = false;
                 }
-                return splittedModalitiesArray;
+            },
+
+            splitModalitiesByType: function () {
+                if (this.modalitiesObjectArray) {
+                    let splittedModalitiesArray = [];
+                    let tmpIndexArray = [];
+                    for (let i = 1; i < 19; i++) {
+                        for (let obj of this.modalitiesObjectArray) {
+                            if (obj.type_id === i) {
+                                let lastSymbol = obj.start_symbol + obj.text.length;
+                                tmpIndexArray.push([obj.start_symbol, lastSymbol]);
+                            }
+                        }
+                        splittedModalitiesArray.push(
+                            {
+                                'highlight': tmpIndexArray,
+                                'className': this.modalitiesColors[i - 1]
+                            }
+                        );
+                        tmpIndexArray = [];
+                    }
+                    console.log(splittedModalitiesArray)
+                    return splittedModalitiesArray;
+                } else return null
             },
 
             setMenu: function(top, left) {

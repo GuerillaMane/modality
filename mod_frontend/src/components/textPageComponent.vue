@@ -1,6 +1,10 @@
 <template>
     <div id="text-page" class="app-component-column">
-        <div class="card-table">
+        <mu-dialog width="80%" :open.sync="open" :esc-press-close="false" :overlay-close="false">
+            <a class="close" @click.prevent="close">
+                <span style="font-size: 18px;"><font-awesome-icon icon="times" /></span>
+            </a>
+
             <div class="bottom-margin">
                 <mu-row class="bottom-margin" justify-content="center">
                     <mu-text-field v-model="searchText" type="text"
@@ -33,10 +37,10 @@
                             <span v-else>-</span>
                         </td>
                         <td>
-                            <a class="create" @click.prevent="">
+                            <a class="create" @click.prevent="passTextId(obj.id)">
                                 <font-awesome-icon icon="pencil-alt" title="Редактировать"/>
                             </a>
-                            <a class="create" @click.prevent="">
+                            <a class="create" @click.prevent="openDeleteModal(obj.id)">
                                 <font-awesome-icon icon="trash-alt" title="Удалить"/>
                             </a>
                         </td>
@@ -52,8 +56,25 @@
             </div>
 
             <mu-row v-if="errSearch" class="error-response" justify-content="center">
-                {{errSearch}}</mu-row>
-        </div>
+                {{errSearch}}
+            </mu-row>
+
+            <mu-dialog v-if="textDeleteId" title="Удалить выбранный текст?" width="500" max-width="80%"
+                :esc-press-close="false" :overlay-close="false" :open.sync="openDelete">
+                <div v-if="resultDelete">
+                    <span class="orange-text">{{resultDelete}}</span>
+                    <mu-flex class="flex-wrapper" justify-content="end">
+                        <button class="del-button" @click.prevent="closeDeleteModal">Закрыть</button>
+                    </mu-flex>
+                </div>
+                <div v-else>
+                    <mu-flex class="flex-wrapper" justify-content="end">
+                        <button class="del-button" @click.prevent="closeDeleteModal">НЕТ</button>
+                        <button class="del-button yes" @click.prevent="deleteText">ДА</button>
+                    </mu-flex>
+                </div>
+            </mu-dialog>
+        </mu-dialog>
     </div>
 </template>
 
@@ -67,20 +88,29 @@
         components: {
             pagination: () => import('./pagination.vue'),
         },
+        props: {
+            open: {
+                type: Boolean,
+                required: true
+            },
+        },
         data: function () {
             return {
                 listTexts: null,
                 countResult: null,
                 page: 1,
-                limit: 1,
+                limit: 5,
                 searchText: '',
                 searchUrl: '',
                 errSearch: '',
+
+                textDeleteId: null,
+                openDelete: false,
+                resultDelete: null
             }
         },
         methods: {
             getPageTexts: function () {
-                this.setInitPage();
                 this.errSearch = '';
                 let requestData = {
                     "page": this.page,
@@ -116,6 +146,40 @@
                     });
             },
 
+            passTextId: function(id) {
+                this.$emit('getText', id);
+                this.close();
+            },
+
+            close: function() {
+                this.$emit('close');
+            },
+
+            openDeleteModal: function (id) {
+                this.textDeleteId = id;
+                this.openDelete = true;
+            },
+
+            closeDeleteModal: function () {
+                this.openDelete = false;
+                this.setInitPage();
+                this.getPageTexts();
+                this.textDeleteId = null;
+                this.resultDelete = null;
+            },
+
+            deleteText: function () {
+                if (this.textDeleteId) {
+                    axios.delete(`/text?id=${this.textDeleteId}`)
+                    .then(response => {
+                        this.resultDelete = 'Выполнено успешно';
+                        this.getPageTexts();
+                    })
+                } else {
+                    this.resultDelete = 'Ошибка при удалении :('
+                }
+            },
+
             resetFilters: function () {
                 this.searchText = '';
                 this.searchUrl = '';
@@ -132,6 +196,7 @@
         },
         mounted() {
             this.getPageTexts();
+            this.setInitPage();
         }
     }
 </script>
