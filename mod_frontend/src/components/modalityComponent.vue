@@ -37,6 +37,14 @@
                 <span class="red-text">{{errResult}}</span>
             </mu-row>
 
+            <mu-row v-if="result" class="error-response" justify-content="center">
+                <span class="orange-text">{{result}}</span>
+            </mu-row>
+
+            <mu-row v-if="errResult" class="error-response" justify-content="center">
+                <span class="red-text">{{errResult}}</span>
+            </mu-row>
+
             <mu-row class="bottom-margin" @contextmenu="openMenu">
                 <textarea v-model="currentText" id="txt" class="mod-text"></textarea>
             </mu-row>
