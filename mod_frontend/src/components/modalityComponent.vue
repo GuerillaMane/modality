@@ -123,11 +123,18 @@
         },
         methods: {
             fixText: function () {
-                if (this.currentLangId) {
+                if (this.currentLangId && !this.currentTextId) {
                     document.getElementById("txt").readOnly = "true";
                     this.editMode = false;
                     this.fixMode = true;
                     this.putText();
+                // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                // } else if (this.currentLangId && this.currentTextId) {
+                //     document.getElementById("txt").readOnly = "true";
+                //     this.editMode = false;
+                //     this.fixMode = true;
+                //     this.patchText();
+                // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 } else {
                     this.errResult = 'Выберите язык данного текста';
                     const self = this;
@@ -239,6 +246,9 @@
                     this.currentText = response.data.text;
                     this.currentTextId = response.data.id;
                     this.currentLangId = response.data.lang.id;
+                    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    // this.editMode = true;
+                    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                     this.editMode = false;
                     this.fixMode = true;
                 })
@@ -284,14 +294,34 @@
 
                         }
                     })
-                    .then(() => {
-
-                    })
+                    // .then(() => {
+                    // })
                     .catch(error => {
                         // console.log(error.response.data.error);
                         this.errResult = error.response.data.error;
                     });
             },
+
+            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            // patchText: function () {
+            //     let requestData = {
+            //         id: this.currentTextId,
+            //         text: this.currentText,
+            //         // url: this.currentUrl,
+            //         lang: {
+            //             id: this.currentLangId
+            //         }
+            //     }
+            //     axios.patch('/text', requestData)
+            //         .then(response => {
+            //             this.currentTextId = response.data.id;
+            //         })
+            //         .catch(error => {
+            //             // console.log(error.response.data.error);
+            //             this.errResult = error.response.data.error;
+            //         });
+            // },
+            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
             highlightText: function (highlight) {
                 this.textHighlighted = true;
