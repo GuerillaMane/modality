@@ -20,10 +20,10 @@
 <!--                                   style="width: 300px;">-->
 <!--                    </mu-text-field>-->
 
-<!--                    <a class="create" @click.prevent="approveAdd" title="подтвердить">-->
+<!--                    <a class="create" @click.prevent="putModality" title="подтвердить">-->
 <!--                        <font-awesome-icon icon="check-circle" />-->
 <!--                    </a>-->
-<!--                    <a class="create" @click.prevent="cancelAdd" title="отмена">-->
+<!--                    <a class="create" @click.prevent="cancelPutModality" title="отмена">-->
 <!--                        <font-awesome-icon icon="times-circle" />-->
 <!--                    </a>-->
 <!--                </div>-->
@@ -79,7 +79,6 @@
         },
         data: function () {
             return {
-                // textString: '',
                 textData: {
                     text: null,
                     // url: null,
@@ -158,11 +157,11 @@
 
             chooseType: function (type) {
                 this.typeChoice = type;
-                this.approveAdd();
+                this.putModality();
                 this.closeMenu();
             },
 
-            approveAdd: function () {
+            putModality: function () {
                 if (this.typeChoice && this.selectedText) {
                     let requestData = {
                         text: this.selectedText,
@@ -170,21 +169,40 @@
                         text_id: this.currentTextId,
                         start_symbol: this.selectedModalityStart
                     };
+                    for (let obj of this.modalitiesObjectArray) {
+                        if (requestData.start_symbol >= obj.start_symbol &&
+                            requestData.start_symbol <= obj.start_symbol + obj.text.length) {
+                            this.deleteModality(obj.id);
+                        } else if (requestData.start_symbol <= obj.start_symbol &&
+                            obj.start_symbol <= requestData.start_symbol + requestData.text.length) {
+                            this.deleteModality(obj.id);
+                        }
+                    }
                     axios.put('/modality', requestData)
                     .then(response => {
                         if (response.status === 200) {
                             this.getText(this.currentTextId);
-                            this.cancelAdd();
+                            this.cancelPutModality();
                         }
                     })
-                    .catch(response => {
-                        // console.log(response);
+                    .catch(error => {
+                        // console.log(error.response.data.error);
                         this.errResult = 'Ошибка добавления';
                     })
                 }
             },
 
-            cancelAdd: function () {
+            deleteModality: function(id) {
+                axios.delete(`/modality?id=${id}`)
+                .then(response => {
+                    console.log(response);
+                })
+                .catch(error => {
+                    console.log(error.response.data.error);
+                })
+            },
+
+            cancelPutModality: function () {
                 this.errResult = null;
                 this.typeChoice = null;
                 this.selectedText = '';
@@ -198,9 +216,9 @@
                     this.allLanguages = response.data.languages;
                 }
             })
-            .catch(response => {
-                console.log(response);
-            });
+            .catch(error => {
+                console.log(error.response.data.error);
+            })
             },
 
             getTypes: function () {
@@ -208,16 +226,16 @@
                 .then(response => {
                     this.allTypes = response.data.types;
                 })
-                .catch(response => {
-                    console.log(response);
-                });
+                .catch(error => {
+                    console.log(error.response.data.error);
+                })
             },
 
             getText: function (textId) {
                 this.currentLangId = null;
                 axios.get(`text?id=${textId}`)
                 .then(response => {
-                    console.log(response);
+                    // console.log(response);
                     this.currentText = response.data.text;
                     this.currentTextId = response.data.id;
                     this.currentLangId = response.data.lang.id;
@@ -236,6 +254,7 @@
                 axios.get(`modalities?id=${textId}`)
                 .then(response => {
                     this.modalitiesObjectArray = response.data.modalities;
+                    // console.log(this.modalitiesObjectArray);
                     // this.currentModalities = response.data.modalities.map(o => o.text);
                 })
                 .then(() => {
@@ -268,9 +287,9 @@
                     .then(() => {
 
                     })
-                    .catch(response => {
-                        // console.log(response);
-                        this.errResult = response.response.data.error;
+                    .catch(error => {
+                        // console.log(error.response.data.error);
+                        this.errResult = error.response.data.error;
                     });
             },
 
@@ -307,7 +326,6 @@
                         );
                         tmpIndexArray = [];
                     }
-                    console.log(splittedModalitiesArray)
                     return splittedModalitiesArray;
                 } else return null
             },
