@@ -7,7 +7,7 @@
                 </li>
             </ul>
         </div>
-        <div>
+        <div class="center-item">
             <mu-row class="bottom-margin" justify-content="between" align-items="center">
                 <mu-select v-model="currentLangId" style="width: 100px;">
                     <mu-option v-for="lang in allLanguages" :key="lang"
@@ -15,11 +15,9 @@
                     </mu-option>
                 </mu-select>
 
-                <mu-text-field class="url-input" v-model="currentUrl" type="text" help-text="URL"></mu-text-field>
-            </mu-row>
-
-            <mu-row v-if="errResult" class="error-response" justify-content="center">
-                <span class="red-text">{{errResult}}</span>
+                <mu-text-field v-if="editMode"
+                        class="url-input" v-model="currentUrl" type="text" help-text="URL"></mu-text-field>
+                <a class="url-link" v-if="!editMode" :href="this.currentUrl" target="_blank">{{ this.currentUrl }}</a>
             </mu-row>
 
             <mu-row class="bottom-margin" @contextmenu="openMenu">
@@ -27,7 +25,16 @@
             </mu-row>
 
             <mu-row class="bottom-margin">
-                <button v-if="editMode" class="def-button" @click.prevent="fixText">Сохранить</button>
+                <div class="left-part-row">
+                    <span class="red-text">{{errResult}}</span>
+                </div>
+                <div class="right-part-row">
+                    <button v-if="editMode" class="def-button" @click.prevent="fixText">Сохранить</button>
+                </div>
+            </mu-row>
+
+            <mu-row justify-content="center" align-items="center">
+                <button class="def-button" @click="openTexts=true">Список текстов</button>
             </mu-row>
 
             <ul id="right-click-menu" tabindex="-1" ref="right" v-if="viewMenu"
@@ -39,11 +46,11 @@
             </ul>
         </div>
 
-        <div class="right-item">
-            <mu-row>
-                <button class="text-button" @click="openTexts=true">Список текстов</button>
-            </mu-row>
-        </div>
+<!--        <div class="right-item">-->
+<!--            <mu-row>-->
+<!--                <button class="text-button" @click="openTexts=true">Список текстов</button>-->
+<!--            </mu-row>-->
+<!--        </div>-->
 
         <text-page-component v-if="openTexts" :open="openTexts"
                 @getText="getText" @addText='nextText' @close="openTexts=false">
@@ -66,7 +73,7 @@
             return {
                 textData: {
                     text: null,
-                    // url: null,
+                    url: null,
                     lang: {
                         id: null
                     }
@@ -75,6 +82,7 @@
                 selectedModalityStart: null,
 
                 currentText: null,
+                currentUrl: null,
                 currentTextId: null,
                 currentModalities: null,
                 modalitiesObjectArray: null,
@@ -99,9 +107,6 @@
                     'peach', 'brown', 'pink', 'light-blue', 'orange', 'red', 'acid-green', 'fluorescent-orange',
                     'prune'],
 
-                // currentUrl: '',
-
-                // result: null,
                 errResult: null,
             }
         },
@@ -109,22 +114,14 @@
             fixText: function () {
                 if (this.currentLangId) {
                     if (!this.currentTextId) {
-                        document.getElementById("txt").readOnly = "true";
-                        this.editMode = false;
                         // this.fixMode = true;
                         this.putText();
                     } else if (this.currentTextId) {
-                        document.getElementById("txt").readOnly = "true";
-                        this.editMode = false;
                         // this.fixMode = true;
                         this.patchText();
                     }
                 } else {
-                    this.errResult = 'Выберите язык данного текста';
-                    const self = this;
-                    setTimeout(function () {
-                        self.errResult = null;
-                    }, 2000);
+                    this.throwErrorMessage('Выберите язык данного текста');
                 }
             },
 
@@ -148,27 +145,25 @@
             },
 
             chooseType: function (type) {
-                if (this.currentTextId) {
+                if (this.currentTextId && !this.editMode) {
                     this.typeChoice = type;
                     this.putModality();
                 } else {
-                    this.errResult = ('Сохраните текст');
-                    const self = this;
-                    setTimeout(function () {
-                        self.errResult = null;
-                    }, 2000);
+                    this.throwErrorMessage('Сохраните текст');
                 }
                 this.closeMenu();
             },
 
             checkModalityApposition: function(startSymbol, length) {
-                for (let obj of this.modalitiesObjectArray) {
-                    if (startSymbol >= obj.start_symbol &&
-                        startSymbol <= obj.start_symbol + obj.text.length) {
-                        this.deleteModality(obj.id);
-                    } else if (startSymbol <= obj.start_symbol &&
-                        obj.start_symbol <= startSymbol + length) {
-                        this.deleteModality(obj.id);
+                if(this.modalitiesObjectArray) {
+                    for (let obj of this.modalitiesObjectArray) {
+                        if (startSymbol >= obj.start_symbol &&
+                            startSymbol <= obj.start_symbol + obj.text.length - 1) {
+                            this.deleteModality(obj.id);
+                        } else if (startSymbol <= obj.start_symbol &&
+                            obj.start_symbol <= startSymbol + length) {
+                            this.deleteModality(obj.id);
+                        }
                     }
                 }
             },
@@ -181,17 +176,17 @@
                         text_id: this.currentTextId,
                         start_symbol: this.selectedModalityStart
                     };
-                    this.checkModalityApposition(requestData.start_symbol, requestData.text.length);
+                    this.checkModalityApposition(requestData.start_symbol, requestData.text.length - 1);
                     axios.put('/modality', requestData)
                     .then(response => {
                         if (response.status === 200) {
-                            this.getText(this.currentTextId);
+                            this.getText(this.currentTextId, false);
                             this.cancelPutModality();
                         }
                     })
                     .catch(error => {
                         // console.log(error.response.data.error);
-                        this.errResult = 'Ошибка добавления';
+                        this.throwErrorMessage('Ошибка добавления');
                     })
                 }
             },
@@ -208,14 +203,11 @@
 
             deleteModalityClick: function() {
                 if (this.selectedModalityStart && this.selectedText) {
-                    this.checkModalityApposition(this.selectedModalityStart, this.selectedText.length);
+                    this.checkModalityApposition(this.selectedModalityStart, this.selectedText.length - 1);
                     this.getText(this.currentTextId);
                 } else {
-                    this.errResult = 'Выберите модальность';
-                    const self = this;
-                    setTimeout(function () {
-                        self.errResult = null;
-                    }, 2000);
+                    console.log(this.selectedModalityStart, this.selectedText)
+                    this.throwErrorMessage('Выберите модальность');
                 }
                 this.closeMenu();
             },
@@ -249,16 +241,17 @@
                 })
             },
 
-            getText: function (textId) {
+            getText: function (textId, isEdit) {
                 this.currentLangId = null;
                 axios.get(`text?id=${textId}`)
                 .then(response => {
                     this.currentText = response.data.text;
+                    this.currentUrl = response.data.url;
                     this.currentTextId = response.data.id;
                     this.currentLangId = response.data.lang.id;
-                    this.editMode = true;
-                    // this.editMode = false;
-                    // this.fixMode = true;
+                    if (isEdit) {
+                        this.editMode = true;
+                    }
                 })
                 .then(() => {
                     this.getCurrentTextModalities(textId);
@@ -289,7 +282,7 @@
             putText: function () {
                 let requestData = {
                     text: this.currentText,
-                    // url: this.currentUrl,
+                    url: this.currentUrl,
                     lang: {
                         id: this.currentLangId
                     }
@@ -298,16 +291,11 @@
                     .then(response => {
                         if (response.status === 200) {
                             this.currentTextId = response.data.id;
-
+                            this.fixEditMode();
                         }
                     })
-                    // .then(() => {
-                    // })
                     .catch(error => {
-                        this.errResult = error.response.data.error;
-                        setTimeout(function () {
-                            self.errResult = null;
-                        }, 2000);
+                        this.throwErrorMessage(error.response.data.error);
                     });
             },
 
@@ -315,7 +303,7 @@
                 let requestData = {
                     id: this.currentTextId,
                     text: this.currentText,
-                    // url: this.currentUrl,
+                    url: this.currentUrl,
                     lang: {
                         id: this.currentLangId
                     }
@@ -323,15 +311,15 @@
                 axios.patch('/text', requestData)
                     .then(response => {
                         this.currentTextId = response.data.id;
+                        this.fixEditMode();
                     })
                     .catch(error => {
                         if (error.response.status === 422) {
-                            // pass
-                        } else {
-                            this.errResult = error.response.data.error;
-                            setTimeout(function () {
-                                self.errResult = null;
-                            }, 2000);
+                            if (error.response.data.error !== 'old and new datas is equal') {
+                                this.throwErrorMessage(error.response.data.error);
+                            } else {
+                                this.editMode = false;
+                            }
                         }
                     });
             },
@@ -399,7 +387,20 @@
                     this.setMenu(e.y, e.x);
                 }.bind(this));
                 e.preventDefault();
-            }
+            },
+
+            throwErrorMessage: function (message) {
+                this.errResult = message;
+                const self = this;
+                    setTimeout(function () {
+                    self.errResult = null;
+                }, 2000);
+            },
+
+            fixEditMode: function () {
+                document.getElementById("txt").readOnly = "true";
+                this.editMode = false;
+            },
         },
         mounted() {
             this.getLanguages();

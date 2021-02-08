@@ -144,9 +144,6 @@
 </script>
 
 <style scoped>
-    .card-table {
-        width: 800px;
-    }
     .mu-input {
         margin-right: 0px;
     }

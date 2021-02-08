@@ -17,7 +17,7 @@
                     </div>
 
                     <div class="right-part-row">
-                        <button @click.prevent="addText">Добавить текст</button>
+                        <button class="add-button" @click.prevent="addText">Добавить текст</button>
                         <a class="close" @click.prevent="close">
                             <span style="font-size: 18px;"><font-awesome-icon icon="times" /></span>
                         </a>
@@ -39,7 +39,7 @@
                         <td>{{ obj.lang.name }}</td>
                         <td>{{ obj.text }}</td>
                         <td>
-                            <a v-if="obj.url" :href="obj.url" target="_blank">{{ obj.url }}</a>
+                            <a class="url-link" v-if="obj.url" :href="obj.url" target="_blank">{{ obj.url }}</a>
                             <span v-else>-</span>
                         </td>
                         <td>
@@ -158,7 +158,7 @@
             },
 
             passTextId: function(id) {
-                this.$emit('getText', id);
+                this.$emit('getText', id, true);
                 this.close();
             },
 
@@ -213,8 +213,5 @@
 </script>
 
 <style scoped>
-    a {
-        color: #6F6F6F;
-        text-decoration: underline;
-    }
+
 </style>
