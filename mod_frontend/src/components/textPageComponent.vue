@@ -1,21 +1,27 @@
 <template>
     <div id="text-page" class="app-component-column">
         <mu-dialog width="80%" :open.sync="open" :esc-press-close="false" :overlay-close="false">
-            <a class="close" @click.prevent="close">
-                <span style="font-size: 18px;"><font-awesome-icon icon="times" /></span>
-            </a>
 
-            <div class="bottom-margin">
-                <mu-row class="bottom-margin" justify-content="center">
-                    <mu-text-field v-model="searchText" type="text"
-                                   help-text="текст" @input="getPageTexts"></mu-text-field>
+            <div class="bottom-margin text-filter">
+                <mu-row class="bottom-margin" align-items="center" w>
+                    <div class="left-part-row">
+                        <mu-text-field v-model="searchText" type="text"
+                                    help-text="текст" @input="getPageTexts"></mu-text-field>
 
-                    <mu-text-field v-model="searchUrl" type="text"
-                                   help-text="url" @input="getPageTexts"></mu-text-field>
+                        <mu-text-field v-model="searchUrl" type="text"
+                                    help-text="url" @input="getPageTexts"></mu-text-field>
 
-                    <a class="create" title="Сброс" @click="resetFilters">
-                        <span style="font-size: 17px;"><font-awesome-icon icon="times-circle"/></span>
-                    </a>
+                        <a class="create" title="Сброс" @click="resetFilters">
+                            <span style="font-size: 17px;"><font-awesome-icon icon="times-circle"/></span>
+                        </a>
+                    </div>
+
+                    <div class="right-part-row">
+                        <button @click.prevent="addText">Добавить текст</button>
+                        <a class="close" @click.prevent="close">
+                            <span style="font-size: 18px;"><font-awesome-icon icon="times" /></span>
+                        </a>
+                    </div>
                 </mu-row>
             </div>
 
@@ -144,6 +150,11 @@
                     .catch(error => {
                         console.log(error.response.data.error);
                     });
+            },
+
+            addText: function () {
+                this.$emit('addText');
+                this.close();
             },
 
             passTextId: function(id) {

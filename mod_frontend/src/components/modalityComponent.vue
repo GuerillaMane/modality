@@ -8,30 +8,15 @@
             </ul>
         </div>
         <div>
-            <mu-row class="bottom-margin">
-                <mu-select v-model="currentLangId" style="width: 100px; margin-right: 30px">
+            <mu-row class="bottom-margin" justify-content="between" align-items="center">
+                <mu-select v-model="currentLangId" style="width: 100px;">
                     <mu-option v-for="lang in allLanguages" :key="lang"
                                :label="lang.name" :value="lang.id">
                     </mu-option>
                 </mu-select>
 
-<!--                <div v-if="typeChoice">-->
-<!--                    <mu-text-field v-model="typeChoice.name" type="text" readonly help-text="Выбранная модальность"-->
-<!--                                   style="width: 300px;">-->
-<!--                    </mu-text-field>-->
-
-<!--                    <a class="create" @click.prevent="putModality" title="подтвердить">-->
-<!--                        <font-awesome-icon icon="check-circle" />-->
-<!--                    </a>-->
-<!--                    <a class="create" @click.prevent="cancelPutModality" title="отмена">-->
-<!--                        <font-awesome-icon icon="times-circle" />-->
-<!--                    </a>-->
-<!--                </div>-->
+                <mu-text-field class="url-input" v-model="currentUrl" type="text" help-text="URL"></mu-text-field>
             </mu-row>
-
-<!--            <mu-row v-if="result" class="error-response" justify-content="center">-->
-<!--                <span class="orange-text">{{result}}</span>-->
-<!--            </mu-row>-->
 
             <mu-row v-if="errResult" class="error-response" justify-content="center">
                 <span class="red-text">{{errResult}}</span>
@@ -43,11 +28,11 @@
 
             <mu-row class="bottom-margin">
                 <button v-if="editMode" class="def-button" @click.prevent="fixText">Сохранить</button>
-                <button v-if="fixMode" class="def-button" @click.prevent="nextText">След.</button>
             </mu-row>
 
             <ul id="right-click-menu" tabindex="-1" ref="right" v-if="viewMenu"
                 @blur="closeMenu" :style="{top:top, left:left}">
+                <li @click="deleteModalityClick">удалить модальность</li>
                 <li v-for="type in allTypes" :key="type" @click="chooseType(type); selectHighlightedText()">
                     {{ type.name }}
                 </li>
@@ -61,7 +46,7 @@
         </div>
 
         <text-page-component v-if="openTexts" :open="openTexts"
-                @getText="getText" @close="openTexts=false">
+                @getText="getText" @addText='nextText' @close="openTexts=false">
         </text-page-component>
     </div>
 </template>
@@ -101,7 +86,6 @@
                 typeChoice: null,
                 allTypes: null,
 
-                // languagesList: null
                 allLanguages: null,
                 currentLangId: null,
 
@@ -109,7 +93,7 @@
                 textHighlighted: false,
 
                 editMode: true,
-                fixMode: false,
+                // fixMode: false,
 
                 modalitiesColors: ['green', 'light-red', 'blue', 'yellow', 'violet', 'gray', 'mint', 'purple', 'ginger',
                     'peach', 'brown', 'pink', 'light-blue', 'orange', 'red', 'acid-green', 'fluorescent-orange',
@@ -123,18 +107,18 @@
         },
         methods: {
             fixText: function () {
-                if (this.currentLangId && !this.currentTextId) {
-                    document.getElementById("txt").readOnly = "true";
-                    this.editMode = false;
-                    this.fixMode = true;
-                    this.putText();
-                // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                // } else if (this.currentLangId && this.currentTextId) {
-                //     document.getElementById("txt").readOnly = "true";
-                //     this.editMode = false;
-                //     this.fixMode = true;
-                //     this.patchText();
-                // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                if (this.currentLangId) {
+                    if (!this.currentTextId) {
+                        document.getElementById("txt").readOnly = "true";
+                        this.editMode = false;
+                        // this.fixMode = true;
+                        this.putText();
+                    } else if (this.currentTextId) {
+                        document.getElementById("txt").readOnly = "true";
+                        this.editMode = false;
+                        // this.fixMode = true;
+                        this.patchText();
+                    }
                 } else {
                     this.errResult = 'Выберите язык данного текста';
                     const self = this;
@@ -146,12 +130,13 @@
 
             nextText: function () {
                 this.typeChoice = null;
-                this.currentText = '';
+                this.currentText = null;
+                this.currentUrl = null;
                 this.currentTextId = null;
                 this.currentLangId = null;
                 this.destroyTextHighlight(this.textHighlighted);
                 document.getElementsByTagName("textarea")[0].readOnly = false;
-                this.fixMode = false;
+                // this.fixMode = false;
                 this.editMode = true;
             },
 
@@ -163,9 +148,29 @@
             },
 
             chooseType: function (type) {
-                this.typeChoice = type;
-                this.putModality();
+                if (this.currentTextId) {
+                    this.typeChoice = type;
+                    this.putModality();
+                } else {
+                    this.errResult = ('Сохраните текст');
+                    const self = this;
+                    setTimeout(function () {
+                        self.errResult = null;
+                    }, 2000);
+                }
                 this.closeMenu();
+            },
+
+            checkModalityApposition: function(startSymbol, length) {
+                for (let obj of this.modalitiesObjectArray) {
+                    if (startSymbol >= obj.start_symbol &&
+                        startSymbol <= obj.start_symbol + obj.text.length) {
+                        this.deleteModality(obj.id);
+                    } else if (startSymbol <= obj.start_symbol &&
+                        obj.start_symbol <= startSymbol + length) {
+                        this.deleteModality(obj.id);
+                    }
+                }
             },
 
             putModality: function () {
@@ -176,15 +181,7 @@
                         text_id: this.currentTextId,
                         start_symbol: this.selectedModalityStart
                     };
-                    for (let obj of this.modalitiesObjectArray) {
-                        if (requestData.start_symbol >= obj.start_symbol &&
-                            requestData.start_symbol <= obj.start_symbol + obj.text.length) {
-                            this.deleteModality(obj.id);
-                        } else if (requestData.start_symbol <= obj.start_symbol &&
-                            obj.start_symbol <= requestData.start_symbol + requestData.text.length) {
-                            this.deleteModality(obj.id);
-                        }
-                    }
+                    this.checkModalityApposition(requestData.start_symbol, requestData.text.length);
                     axios.put('/modality', requestData)
                     .then(response => {
                         if (response.status === 200) {
@@ -209,10 +206,24 @@
                 })
             },
 
+            deleteModalityClick: function() {
+                if (this.selectedModalityStart && this.selectedText) {
+                    this.checkModalityApposition(this.selectedModalityStart, this.selectedText.length);
+                    this.getText(this.currentTextId);
+                } else {
+                    this.errResult = 'Выберите модальность';
+                    const self = this;
+                    setTimeout(function () {
+                        self.errResult = null;
+                    }, 2000);
+                }
+                this.closeMenu();
+            },
+
             cancelPutModality: function () {
                 this.errResult = null;
                 this.typeChoice = null;
-                this.selectedText = '';
+                this.selectedText = null;
                 this.selectedModalityStart = null;
             },
 
@@ -242,15 +253,12 @@
                 this.currentLangId = null;
                 axios.get(`text?id=${textId}`)
                 .then(response => {
-                    // console.log(response);
                     this.currentText = response.data.text;
                     this.currentTextId = response.data.id;
                     this.currentLangId = response.data.lang.id;
-                    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                    // this.editMode = true;
-                    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                    this.editMode = false;
-                    this.fixMode = true;
+                    this.editMode = true;
+                    // this.editMode = false;
+                    // this.fixMode = true;
                 })
                 .then(() => {
                     this.getCurrentTextModalities(textId);
@@ -264,7 +272,6 @@
                 axios.get(`modalities?id=${textId}`)
                 .then(response => {
                     this.modalitiesObjectArray = response.data.modalities;
-                    // console.log(this.modalitiesObjectArray);
                     // this.currentModalities = response.data.modalities.map(o => o.text);
                 })
                 .then(() => {
@@ -297,31 +304,37 @@
                     // .then(() => {
                     // })
                     .catch(error => {
-                        // console.log(error.response.data.error);
                         this.errResult = error.response.data.error;
+                        setTimeout(function () {
+                            self.errResult = null;
+                        }, 2000);
                     });
             },
 
-            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            // patchText: function () {
-            //     let requestData = {
-            //         id: this.currentTextId,
-            //         text: this.currentText,
-            //         // url: this.currentUrl,
-            //         lang: {
-            //             id: this.currentLangId
-            //         }
-            //     }
-            //     axios.patch('/text', requestData)
-            //         .then(response => {
-            //             this.currentTextId = response.data.id;
-            //         })
-            //         .catch(error => {
-            //             // console.log(error.response.data.error);
-            //             this.errResult = error.response.data.error;
-            //         });
-            // },
-            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            patchText: function () {
+                let requestData = {
+                    id: this.currentTextId,
+                    text: this.currentText,
+                    // url: this.currentUrl,
+                    lang: {
+                        id: this.currentLangId
+                    }
+                }
+                axios.patch('/text', requestData)
+                    .then(response => {
+                        this.currentTextId = response.data.id;
+                    })
+                    .catch(error => {
+                        if (error.response.status === 422) {
+                            // pass
+                        } else {
+                            this.errResult = error.response.data.error;
+                            setTimeout(function () {
+                                self.errResult = null;
+                            }, 2000);
+                        }
+                    });
+            },
 
             highlightText: function (highlight) {
                 this.textHighlighted = true;

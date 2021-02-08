@@ -54,7 +54,6 @@ html {
     flex: 1;
     display: flex;
     justify-content: center;
-    /*align-items: center;*/
 }
 
 a{
@@ -168,8 +167,15 @@ header ul a:hover{
 
 .mu-input {
     margin-bottom: 5px;
+}
+
+.text-filter .mu-input {
     width: 190px;
     margin-right: 32px;
+}
+
+.url-input {
+    width: 240px;
 }
 
 .mu-input-focus-line {
@@ -209,7 +215,27 @@ header ul a:hover{
     overflow-wrap: break-word;
 }
 
-button{
+@media (max-width: 1500px) {
+    .mod-text {
+        width: 500px;
+        min-height: 350px;
+    }
+    .text-button{
+        margin-top: 262px;
+    }
+}
+
+@media (min-width: 1500px) {
+    .mod-text {
+        width: 1000px;
+        min-height: 600px;
+    }
+    .text-button{
+        margin-top: 387px;
+    }
+}
+
+button {
     background-color: #7FC4CA;
     color: white;
     box-shadow: none;
@@ -230,10 +256,28 @@ button:hover {
 }
 
 .text-button {
-    width: 120px;
+    width: auto;
     height: 30px;
-    margin-top: 250px;
 }
+
+.left-part-row {
+    flex: 5;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+}
+
+.right-part-row {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.right-part-row button {
+    margin-right: 30px;
+}
+
 
 #right-click-menu{
     background: #FAFAFA;
@@ -303,13 +347,6 @@ button:hover {
 
 .close {
     cursor: pointer;
-    float: right;
-}
-
-.close {
-    cursor: pointer;
-    float: right;
-    margin-top: -10px;
 }
 
 .close path {
@@ -510,7 +547,6 @@ button:hover {
 
 ::marker {
     content: "▅";
-    font-size: 2em;
 
     --hue: greenyellow;
     color: var(--hue)
@@ -540,4 +576,19 @@ button:hover {
 
 .legend-li ul, ol {
   max-width: 30ch;
+}
+
+@media (max-width: 1500px) {
+    ::marker {
+        font-size: 1.5em;
+    }
+    .legend-li {
+        font-size: 13px;
+    }
+}
+
+@media (min-width: 1500px) {
+    ::marker {
+        font-size: 2em;
+    }
 }
