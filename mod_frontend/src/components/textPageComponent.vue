@@ -158,7 +158,7 @@
             },
 
             passTextId: function(id) {
-                this.$emit('getText', id, true);
+                this.$emit('getText', id, false);
                 this.close();
             },
 

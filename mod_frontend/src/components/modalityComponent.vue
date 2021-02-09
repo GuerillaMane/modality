@@ -204,7 +204,7 @@
             deleteModalityClick: function() {
                 if (this.selectedModalityStart && this.selectedText) {
                     this.checkModalityApposition(this.selectedModalityStart, this.selectedText.length - 1);
-                    this.getText(this.currentTextId);
+                    this.getText(this.currentTextId, false);
                 } else {
                     console.log(this.selectedModalityStart, this.selectedText)
                     this.throwErrorMessage('Выберите модальность');
@@ -242,6 +242,7 @@
             },
 
             getText: function (textId, isEdit) {
+                this.editMode = false;
                 this.currentLangId = null;
                 axios.get(`text?id=${textId}`)
                 .then(response => {
